@@ -1,0 +1,150 @@
+---
+import '@fontsource-variable/bodoni-moda/opsz.css';
+import '@fontsource-variable/bodoni-moda/opsz-italic.css';
+import '@fontsource-variable/familjen-grotesk/index.css';
+import '../../../prototypes/atelier.css';
+import PrototypeLayout from '../../../layouts/PrototypeLayout.astro';
+import { person, projects, ratio } from '../../../prototypes/data';
+import { fibers, grain, smoke, tornMask, weave } from '../../../prototypes/textures';
+
+// Materialien der Collage, alle prozedural.
+const M = {
+  paper: (s: number) => `${fibers(s, '#8f8577')}, ${grain(s, '#3b342c', 0.3)}, #efebe3`,
+  news: (s: number) => `${grain(s, '#2a2622', 0.45)}, ${fibers(s + 2, '#6e675c')}, #cdc7bb`,
+  cloth: (s: number) => `${weave(s, '#3c3532')}, ${grain(s, '#000000', 0.4)}, #141110`,
+  lilac: (s: number) => `${fibers(s, '#6f58d6')}, ${grain(s, '#2b1d6b', 0.25)}, #b9a8ff`,
+  smoke: (s: number) => `${smoke(s, '#efebe3')}, ${grain(s, '#000000', 0.35)}, #2a0709`,
+};
+const torn = (s: number, w = 400, h = 300, d = 14) => `mask-image: ${tornMask(s, w, h, d)}; -webkit-mask-image: ${tornMask(s, w, h, d)}`;
+
+const plates = ['smoke', 'lilac', 'cloth', 'paper', 'news', 'smoke', 'cloth', 'lilac', 'news'] as const;
+// Lage der Projekte: Spalte, Breite, Drehung, Tempo beim Scrollen.
+const spots = [
+  { col: '1 / span 6', rot: -2, speed: 0.04 },
+  { col: '8 / span 4', rot: 3, speed: -0.06 },
+  { col: '3 / span 3', rot: -4, speed: 0.08 },
+  { col: '6 / span 6', rot: 1.5, speed: -0.03 },
+  { col: '1 / span 5', rot: 2, speed: 0.06 },
+  { col: '7 / span 3', rot: -3, speed: -0.07 },
+  { col: '9 / span 4', rot: 4, speed: 0.03 },
+  { col: '2 / span 5', rot: -1.5, speed: -0.05 },
+  { col: '6 / span 6', rot: 2.5, speed: 0.05 },
+];
+---
+
+<PrototypeLayout title="Atelier">
+  <script is:inline slot="head">
+    document.documentElement.classList.add('js');
+  </script>
+  <div class="atelier">
+    <div class="ground" aria-hidden="true"></div>
+
+    <header class="bar">
+      <a href="#start">Julian Schleiminger</a>
+      <nav aria-label="Hauptnavigation">
+        <a href="#arbeiten">Arbeiten</a>
+        <a href="#ich">Über mich</a>
+        <a href="#kontakt">Kontakt</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="opening" id="start" aria-labelledby="name">
+        <span class="ghost" aria-hidden="true" data-speed="-0.15">AD</span>
+
+        <h1 id="name" class="name">
+          <span class="strip strip--a piece" data-speed="0.05" style={`background: ${M.paper(3)}; ${torn(3, 900, 260, 16)}`}>Julian</span>
+          <span class="strip strip--b piece" data-speed="-0.04" style={`background: ${M.cloth(5)}; ${torn(5, 1200, 260, 18)}`}>Schleiminger</span>
+        </h1>
+
+        <div class="tracing piece" data-speed="0.12">
+          <p class="caps">{person.role}</p>
+          <p class="claim">{person.claim}</p>
+        </div>
+
+        <span class="tape tape--1 piece" aria-hidden="true" data-speed="0.05"></span>
+        <span class="tape tape--2 piece" aria-hidden="true" data-speed="-0.04"></span>
+        <span class="scrap scrap--1 piece" aria-hidden="true" data-speed="0.45" style={`background: ${M.lilac(11)}; ${torn(11, 300, 300, 22)}`}></span>
+        <span class="scrap scrap--2 piece" aria-hidden="true" data-speed="0.6" style={`background: ${M.news(12)}; ${torn(12, 300, 400, 22)}`}></span>
+        <a class="caps scroll-cue" href="#ich">Weiter</a>
+      </section>
+
+      <section class="about" id="ich" aria-labelledby="ich-titel">
+        <div class="sheet piece" data-speed="0.03" style={`background: ${M.news(21)}; ${torn(21, 800, 700, 18)}`}>
+          <h2 id="ich-titel" class="about__title">Autodidakt.</h2>
+          <p>{person.intro}</p>
+          <ul class="caps skills" aria-label="Kompetenzen">
+            {person.skills.map((s) => <li>{s}</li>)}
+          </ul>
+        </div>
+        <span class="scrap scrap--3 piece" aria-hidden="true" data-speed="0.35" style={`background: ${M.smoke(23)}; ${torn(23, 400, 300, 20)}`}></span>
+        <span class="tape tape--3 piece" aria-hidden="true" data-speed="0.03"></span>
+      </section>
+
+      <section class="work" id="arbeiten" aria-labelledby="work-titel">
+        <h2 id="work-titel" class="work__title piece" data-speed="-0.05">Arbeiten</h2>
+        <ul class="collage">
+          {
+            projects.map((p, i) => (
+              <li class="proj piece" data-speed={spots[i].speed} style={`grid-column: ${spots[i].col}; --rot: ${spots[i].rot}deg`}>
+                <a href="#arbeiten">
+                  <span class="proj__plate" style={`aspect-ratio: ${ratio(p.format)}; background: ${M[plates[i]](40 + i)}; ${torn(40 + i, 600, 600, 12)}`}>
+                    <span class="caps proj__tag">Platzhalter {p.format}{p.video ? ' · Video' : ''}</span>
+                  </span>
+                  <span class="proj__label" style={`background: ${M.paper(60 + i)}; ${torn(60 + i, 500, 160, 8)}`}>
+                    <strong>{p.title}</strong>
+                    <span class="caps">{p.disciplines.join(' / ')} · {p.year}</span>
+                  </span>
+                  <span class="tape" aria-hidden="true"></span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <section class="contact" id="kontakt" aria-labelledby="kontakt-titel">
+        <div class="sheet sheet--contact piece" data-speed="0.04" style={`background: ${M.paper(77)}; ${torn(77, 1000, 600, 20)}`}>
+          <h2 id="kontakt-titel" class="contact__title">Stelle frei?</h2>
+          <p>Ich freue mich auf ein Gespräch über Marken, Kampagnen und alles dazwischen.</p>
+          <a class="mail" href={`mailto:${person.email}`}>{person.email}</a>
+          <p class="caps legal"><a href="#start">Impressum</a> · <a href="#start">Datenschutz</a> · Prototyp mit Platzhaltern</p>
+        </div>
+        <span class="scrap scrap--4 piece" aria-hidden="true" data-speed="0.5" style={`background: ${M.lilac(80)}; ${torn(80, 300, 300, 22)}`}></span>
+      </section>
+    </main>
+  </div>
+</PrototypeLayout>
+
+<script>
+  // Ebenen bewegen sich unterschiedlich schnell. Vordergrund-Fetzen sind unscharf wie vor einem Objektiv.
+  const pieces = [...document.querySelectorAll<HTMLElement>('[data-speed]')];
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const io = new IntersectionObserver(
+    (entries) =>
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add('is-in');
+          io.unobserve(e.target);
+        }
+      }),
+    { rootMargin: '0px 0px -12% 0px' },
+  );
+  document.querySelectorAll('.piece').forEach((p) => io.observe(p));
+
+  function frame() {
+    const mid = innerHeight / 2;
+    for (const p of pieces) {
+      const r = p.getBoundingClientRect();
+      if (r.bottom < -400 || r.top > innerHeight + 400) continue;
+      const offset = (r.top + r.height / 2 - mid) * Number(p.dataset.speed);
+      p.style.setProperty('--py', `${offset.toFixed(1)}px`);
+    }
+  }
+
+  if (!reduced) {
+    addEventListener('scroll', () => requestAnimationFrame(frame), { passive: true });
+    frame();
+  }
+</script>

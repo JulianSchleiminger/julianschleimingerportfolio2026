@@ -1,0 +1,178 @@
+---
+import '@fontsource-variable/big-shoulders-display';
+import '@fontsource-variable/familjen-grotesk/index.css';
+import '../../../prototypes/beton.css';
+import PrototypeLayout from '../../../layouts/PrototypeLayout.astro';
+import { person, projects, ratio } from '../../../prototypes/data';
+import { concreteClouds, concretePores, grain, smoke } from '../../../prototypes/textures';
+
+// Sichtbeton aus drei Rauschschichten, je Platte mit eigenem Zufallswert.
+const concrete = (seed: number) =>
+  `${concretePores(seed, '#2a2824')}, ${concreteClouds(seed, '#3a3732')}, ${grain(seed, '#1b1a17', 0.35)}`;
+
+// Abstand der Platten in der Tiefe (px) und seitliche Lage im Raum.
+const STEP = 1000;
+const items = [
+  { kind: 'title', x: 0, y: 0 },
+  { kind: 'about', x: -0.22, y: 0 },
+  ...projects.map((p, i) => ({ kind: 'project', x: i % 2 ? 0.24 : -0.24, y: (i % 3) * 0.04 - 0.04, project: p })),
+  { kind: 'contact', x: 0, y: 0 },
+];
+const depthOf = (i: number) => i * STEP;
+const pillars = Array.from({ length: items.length + 2 }, (_, i) => ({ z: i * STEP - STEP / 2, side: i % 2 ? 1 : -1 }));
+---
+
+<PrototypeLayout title="Beton">
+  <div class="beton" data-beton style={`--steps: ${items.length}; --step: ${STEP}px`}>
+    <header class="bar">
+      <a href="#halle" data-goto="0">Julian Schleiminger</a>
+      <nav aria-label="Hauptnavigation">
+        <a href="#arbeiten" data-goto="2">Arbeiten</a>
+        <a href="#ich" data-goto="1">Über mich</a>
+        <a href="#kontakt" data-goto={items.length - 1}>Kontakt</a>
+      </nav>
+    </header>
+
+    <div class="track" data-track>
+      <div class="stage" data-stage>
+        <div class="light" aria-hidden="true" data-light></div>
+        <main class="hall" id="halle" data-hall>
+          {
+            pillars.map((pl, i) => (
+              <div class="pillar" aria-hidden="true" data-z={pl.z} style={`--x: ${pl.side}; background-image: ${concrete(200 + i)}`} />
+            ))
+          }
+
+          {
+            items.map((it, i) => {
+              const style = `--x: ${it.x}; --y: ${it.y}; background-image: ${concrete(i + 3)}`;
+              if (it.kind === 'title')
+                return (
+                  <section class="slab slab--title" data-slab data-z={depthOf(i)} style={style} aria-labelledby="name">
+                    <h1 id="name" class="engraved">
+                      <span>Julian</span>
+                      <span>Schleiminger</span>
+                    </h1>
+                    <p class="slab__role">
+                      <strong>{person.role}.</strong> {person.claim}
+                    </p>
+                    <p class="mark">Scrollen, um hineinzugehen</p>
+                  </section>
+                );
+              if (it.kind === 'about')
+                return (
+                  <section class="slab slab--about" id="ich" data-slab data-z={depthOf(i)} style={style} aria-labelledby="ich-titel">
+                    <h2 id="ich-titel" class="engraved">Selbst gebaut.</h2>
+                    <p>{person.intro}</p>
+                    <p class="mark">{person.skills.join(' / ')}</p>
+                  </section>
+                );
+              if (it.kind === 'contact')
+                return (
+                  <section class="slab slab--contact" id="kontakt" data-slab data-z={depthOf(i)} style={style} aria-labelledby="kontakt-titel">
+                    <h2 id="kontakt-titel" class="engraved">Stelle frei?</h2>
+                    <p>Ich freue mich auf ein Gespräch.</p>
+                    <a class="mail" href={`mailto:${person.email}`}>{person.email}</a>
+                    <p class="legal"><a href="#halle" data-goto="0">Impressum</a> · <a href="#halle" data-goto="0">Datenschutz</a> · Prototyp mit Platzhaltern</p>
+                  </section>
+                );
+              const p = it.project!;
+              return (
+                <a class="slab slab--project" id={i === 2 ? 'arbeiten' : undefined} href="#arbeiten" data-slab data-z={depthOf(i)} style={style}>
+                  <span class="window" style={`aspect-ratio: ${ratio(p.format)}; background: ${smoke(i * 7, '#e9e6df')}, #33312d`}>
+                    <span class="window__tag">Platzhalter {p.format}{p.video ? ' · Video' : ''}</span>
+                  </span>
+                  <span class="slab__title engraved">{p.title}</span>
+                  <span class="mark">{p.disciplines.join(' / ')} · {p.year}</span>
+                </a>
+              );
+            })
+          }
+        </main>
+      </div>
+    </div>
+
+    <div class="depth" aria-hidden="true"><span data-depth>0,0</span> m</div>
+  </div>
+</PrototypeLayout>
+
+<script>
+  // Scrollen bewegt die Kamera durch die Halle. Platten weit weg sind unscharf und im Nebel.
+  const root = document.querySelector<HTMLElement>('[data-beton]')!;
+  const track = document.querySelector<HTMLElement>('[data-track]')!;
+  const hall = document.querySelector<HTMLElement>('[data-hall]')!;
+  const light = document.querySelector<HTMLElement>('[data-light]')!;
+  const depthOut = document.querySelector<HTMLElement>('[data-depth]')!;
+  const slabs = [...document.querySelectorAll<HTMLElement>('[data-slab]')];
+  const pillars = [...document.querySelectorAll<HTMLElement>('.pillar')];
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const step = parseFloat(getComputedStyle(root).getPropertyValue('--step'));
+  const total = (slabs.length - 1) * step;
+  let mx = 0;
+  let my = 0;
+
+  function frame() {
+    const max = track.offsetHeight - innerHeight;
+    const progress = Math.min(Math.max(-track.getBoundingClientRect().top / max, 0), 1);
+    const cam = progress * total;
+    hall.style.transform = `translateZ(${cam}px) rotateY(${mx * 2.5}deg) rotateX(${-my * 1.5}deg)`;
+    for (const s of slabs) {
+      const z = Number(s.dataset.z);
+      const d = cam - z; // 0 = im Fokus, negativ = noch vor uns, positiv = hinter uns
+      const blur = Math.min(Math.abs(d) / 240, 10);
+      const fog = Math.min(Math.max(-d, 0) / 5200, 0.85);
+      const gone = d > 500 ? 0 : d > 150 ? 1 - (d - 150) / 350 : 1;
+      s.style.filter = `blur(${blur.toFixed(2)}px) brightness(${(1 - fog).toFixed(3)})`;
+      s.style.opacity = gone.toFixed(3);
+      s.style.visibility = gone <= 0 ? 'hidden' : 'visible';
+      s.inert = Math.abs(d) > step * 0.5;
+    }
+    for (const p of pillars) {
+      const d = cam - Number(p.dataset.z);
+      p.style.filter = `blur(${Math.min(Math.abs(d) / 220, 8).toFixed(1)}px) brightness(${(1 - Math.min(Math.max(-d, 0) / 5200, 0.85)).toFixed(3)})`;
+    }
+    depthOut.textContent = (cam / 100).toFixed(1).replace('.', ',');
+  }
+
+  function layout() {
+    if (reduced) return;
+    track.style.height = `${slabs.length * 85}vh`;
+    // Rastpunkte: Beim Ausrollen bleibt die Kamera vor einer Platte stehen.
+    track.querySelectorAll('.snap').forEach((m) => m.remove());
+    const max = track.offsetHeight - innerHeight;
+    slabs.forEach((_, i) => {
+      const m = document.createElement('span');
+      m.className = 'snap';
+      m.style.top = `${(i / (slabs.length - 1)) * max}px`;
+      track.prepend(m);
+    });
+    slabs.forEach((s) => (s.style.translate = `calc(-50% + ${s.style.getPropertyValue('--x')} * 100vw) calc(-50% + ${s.style.getPropertyValue('--y')} * 100vh) -${s.dataset.z}px`));
+    pillars.forEach((p) => (p.style.translate = `calc(-50% + ${p.style.getPropertyValue('--x')} * 52vw) -50% -${p.dataset.z}px`));
+    frame();
+  }
+
+  addEventListener('pointermove', (e) => {
+    mx = e.clientX / innerWidth - 0.5;
+    my = e.clientY / innerHeight - 0.5;
+    light.style.setProperty('--lx', `${e.clientX}px`);
+    light.style.setProperty('--ly', `${e.clientY}px`);
+    if (!reduced) requestAnimationFrame(frame);
+  });
+
+  // Navigation springt zur passenden Platte.
+  document.querySelectorAll<HTMLAnchorElement>('[data-goto]').forEach((a) =>
+    a.addEventListener('click', (e) => {
+      if (reduced) return;
+      e.preventDefault();
+      const i = Number(a.dataset.goto);
+      const max = track.offsetHeight - innerHeight;
+      scrollTo({ top: track.offsetTop + (i / (slabs.length - 1)) * max, behavior: 'smooth' });
+    }),
+  );
+
+  if (!reduced) {
+    addEventListener('scroll', () => requestAnimationFrame(frame), { passive: true });
+    addEventListener('resize', layout);
+    layout();
+  }
+</script>
