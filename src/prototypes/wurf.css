@@ -1,0 +1,477 @@
+/*
+  Richtung „Wurf“: Farben, Display-Schrift, Texturen und Raster kommen als Variablen
+  aus dem generativen System (wurf.ts). Fest bleiben Fließtextschrift, Abstände und Lesbarkeitsregeln.
+*/
+.wurf {
+  --body: 'Familjen Grotesk Variable', sans-serif;
+  --gutter: clamp(1rem, 4vw, 3.5rem);
+  --gap: clamp(1rem, 2.4vw, 2rem);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --morph: 0.9s var(--ease-out);
+
+  position: relative;
+  min-height: 100vh;
+  overflow-x: clip;
+  font-family: var(--body);
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  color: var(--fg);
+  background: var(--bg);
+  transition: background-color var(--morph), color var(--morph);
+}
+
+.wurf ::selection {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.wurf a {
+  color: inherit;
+  text-underline-offset: 0.2em;
+}
+
+.wurf :focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 4px;
+}
+
+/* Textur über die ganze Seite, fest stehend, damit der Inhalt darüber gleitet. */
+.paper {
+  position: fixed;
+  inset: 0;
+  background: var(--page-texture);
+  opacity: 0.22;
+  pointer-events: none;
+}
+
+/* Lesbarkeitsregel: Text liegt immer auf einer Fläche in Grundfarbe. */
+.plate {
+  background: var(--bg);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.display {
+  font-family: var(--d-family);
+}
+
+.mast {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 30;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.1rem var(--gutter);
+  font-weight: 600;
+  mix-blend-mode: difference;
+  color: #ffffff;
+}
+
+.mast a {
+  text-decoration: none;
+}
+
+.mast nav {
+  display: flex;
+  gap: 1.5rem;
+  white-space: nowrap;
+}
+
+main {
+  position: relative;
+}
+
+main > section {
+  padding: clamp(4rem, 10vw, 9rem) var(--gutter);
+}
+
+/* ---------- Eröffnung ---------- */
+.opening {
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-rows: 1fr auto auto;
+  gap: var(--gap);
+  align-content: end;
+}
+
+.name,
+.manifest__title,
+.werk__title,
+.kontakt__title {
+  font-family: var(--d-family);
+  font-weight: var(--d-weight);
+  font-style: var(--d-style);
+  font-variation-settings: var(--d-axes);
+  text-transform: var(--d-case);
+  letter-spacing: var(--d-tracking);
+  line-height: var(--d-leading);
+  margin: 0;
+}
+
+.name {
+  grid-column: 1 / -1;
+  align-self: end;
+  font-size: calc(var(--d-scale) * clamp(3.25rem, 9.5vw, 10.5rem));
+  view-transition-name: name;
+}
+
+.name span {
+  display: block;
+  transition: translate var(--morph), rotate var(--morph);
+}
+
+.name__b {
+  translate: var(--name-shift) 0;
+  rotate: var(--name-tilt);
+  transform-origin: left;
+}
+
+.role {
+  grid-column: 1 / span 5;
+  margin: 0;
+  font-size: clamp(1.25rem, 2vw, 1.75rem);
+  line-height: 1.25;
+  max-width: 26ch;
+  justify-self: start;
+}
+
+.edition {
+  grid-column: 9 / span 4;
+  align-self: end;
+  font-size: 0.875rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--fg);
+}
+
+.edition__no {
+  margin: 0 0 0.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.edition dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.15rem 1rem;
+  margin: 0;
+}
+
+.edition dl div {
+  display: contents;
+}
+
+.edition dt {
+  opacity: 0.75;
+}
+
+.edition dd {
+  margin: 0;
+}
+
+.hint {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 0.875rem;
+  opacity: 0.8;
+}
+
+/* ---------- Manifest ---------- */
+.manifest {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--gap);
+}
+
+.manifest__title {
+  grid-column: 1 / span 9;
+  font-size: calc(var(--d-scale) * clamp(2.75rem, 7vw, 7rem));
+}
+
+.manifest__text {
+  grid-column: 5 / span 6;
+  margin: var(--gap) 0 0;
+  font-size: clamp(1.125rem, 1.7vw, 1.5rem);
+  line-height: 1.4;
+  max-width: 48ch;
+}
+
+.skills {
+  grid-column: 5 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.skills li {
+  padding: 0.2rem 0.75rem;
+  border: 1px solid var(--fg);
+  border-radius: 999px;
+}
+
+/* ---------- Module ---------- */
+.werk__title {
+  font-size: calc(var(--d-scale) * clamp(3rem, 9vw, 9rem));
+  margin-bottom: var(--gap);
+}
+
+.mods {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: clamp(3rem, 6vw, 5rem) var(--gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mod {
+  grid-column: var(--col) / span var(--span);
+  margin-top: var(--shift);
+  rotate: var(--rot);
+  translate: 0 var(--para, 0px);
+  z-index: calc(3 - var(--depth));
+  transition: rotate var(--morph), margin var(--morph);
+}
+
+.mod a {
+  display: block;
+  text-decoration: none;
+}
+
+.mod__plate {
+  position: relative;
+  display: block;
+  max-height: 78vh;
+  background: var(--tex);
+  scale: calc(1 - var(--depth) * 0.05);
+  filter: blur(calc(var(--depth) * 2.5px));
+  box-shadow: 0 24px 50px -28px rgb(0 0 0 / 0.55);
+  transition: filter 0.5s var(--ease-out), scale 0.6s var(--ease-out);
+}
+
+.mod a:hover .mod__plate,
+.mod a:focus-visible .mod__plate {
+  filter: blur(0);
+  scale: 1.02;
+}
+
+.mod__tag {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  padding: 0.1rem 0.45rem;
+  background: var(--bg);
+  font-size: 0.75rem;
+}
+
+.mod__cap {
+  display: inline-block;
+  margin-top: 0.6rem;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.9375rem;
+}
+
+.mod__cap strong {
+  display: block;
+  font-family: var(--d-family);
+  font-weight: var(--d-weight);
+  font-style: var(--d-style);
+  font-variation-settings: var(--d-axes);
+  text-transform: var(--d-case);
+  font-size: calc(var(--d-scale) * 1.5rem);
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.mod a:hover .mod__cap strong {
+  color: var(--accent);
+}
+
+/* ---------- Kontakt ---------- */
+.kontakt {
+  min-height: 90svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: var(--gap);
+}
+
+.kontakt__title {
+  font-size: calc(var(--d-scale) * clamp(3.5rem, 12vw, 12rem));
+}
+
+.kontakt p {
+  margin: 0;
+  font-size: clamp(1.125rem, 1.6vw, 1.375rem);
+}
+
+.kontakt__mail {
+  font-family: var(--d-family);
+  font-weight: var(--d-weight);
+  font-style: var(--d-style);
+  font-size: calc(var(--d-scale) * clamp(1.5rem, 4vw, 3.5rem));
+  overflow-wrap: anywhere;
+}
+
+.legal {
+  font-size: 0.875rem !important;
+}
+
+/* ---------- Würfel ---------- */
+.die {
+  --size: 300px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 40;
+  width: var(--size);
+  height: var(--size);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: grab;
+  perspective: calc(var(--size) * 4);
+  touch-action: none;
+  view-transition-name: die;
+}
+
+.die:active {
+  cursor: grabbing;
+}
+
+.die__cube {
+  --rx: 90deg;
+  --ry: 0deg;
+  --h: calc(var(--size) / 2);
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  /* Ruhelage leicht gekippt, damit man drei Seiten sieht. */
+  transform: rotateX(-22deg) rotateY(-30deg) rotateX(var(--rx)) rotateY(var(--ry));
+  transition: transform 1.1s cubic-bezier(0.2, 0.9, 0.25, 1.05);
+}
+
+.die__cube.is-dragging {
+  transition: none;
+}
+
+.die__face {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+  padding: 14%;
+  background: var(--face);
+  border-radius: 9%;
+  backface-visibility: hidden;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.15);
+}
+
+.die__face i {
+  place-self: center;
+  width: 58%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+
+.die__face i.on {
+  background: var(--pip);
+  box-shadow: inset 0 2px 3px rgb(0 0 0 / 0.35);
+}
+
+.die__face--1 { transform: translateZ(var(--h)); }
+.die__face--6 { transform: rotateY(-180deg) translateZ(var(--h)); }
+.die__face--3 { transform: rotateY(90deg) translateZ(var(--h)); }
+.die__face--4 { transform: rotateY(-90deg) translateZ(var(--h)); }
+.die__face--2 { transform: rotateX(90deg) translateZ(var(--h)); }
+.die__face--5 { transform: rotateX(-90deg) translateZ(var(--h)); }
+
+/* ---------- Glitch beim Landen ---------- */
+.is-glitch .name,
+.is-glitch .werk__title,
+.is-glitch .manifest__title {
+  animation: glitch 0.45s steps(2) both;
+}
+
+.is-glitch .paper {
+  animation: jitter 0.45s steps(3) both;
+}
+
+@keyframes glitch {
+  0% {
+    text-shadow: 0.06em 0 var(--accent), -0.06em 0 var(--alt);
+    clip-path: inset(10% 0 55% 0);
+    translate: -0.04em 0;
+  }
+  35% {
+    text-shadow: -0.08em 0 var(--accent), 0.05em 0 var(--alt);
+    clip-path: inset(45% 0 12% 0);
+    translate: 0.05em 0;
+  }
+  70% {
+    text-shadow: 0.03em 0 var(--accent);
+    clip-path: inset(0 0 0 0);
+    translate: 0 0;
+  }
+  100% {
+    text-shadow: none;
+    clip-path: none;
+  }
+}
+
+@keyframes jitter {
+  0% { translate: 12px -8px; opacity: 0.5; }
+  50% { translate: -16px 6px; opacity: 0.35; }
+  100% { translate: 0 0; opacity: 0.22; }
+}
+
+::view-transition-group(*) {
+  animation-duration: 0.75s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.45s;
+}
+
+/* ---------- Schmal ---------- */
+@media (max-width: 760px) {
+  .opening,
+  .manifest,
+  .mods {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .opening > *,
+  .manifest > * {
+    grid-column: 1 / -1 !important;
+  }
+
+  .opening {
+    padding-top: 45vw;
+  }
+
+  .mod {
+    grid-column: 1 / -1;
+    margin-top: 0;
+  }
+
+  .mod:nth-child(odd) {
+    grid-column: 1 / span 5;
+  }
+
+  .mod:nth-child(even) {
+    grid-column: 2 / span 5;
+  }
+
+  .mast nav {
+    gap: 1rem;
+    font-size: 0.9375rem;
+  }
+}

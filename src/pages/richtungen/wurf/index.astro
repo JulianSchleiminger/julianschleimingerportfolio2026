@@ -1,0 +1,245 @@
+---
+import '@fontsource-variable/familjen-grotesk/index.css';
+import '@fontsource-variable/bodoni-moda/opsz-italic.css';
+import '@fontsource-variable/big-shoulders-display';
+import '@fontsource-variable/unbounded/index.css';
+import '@fontsource-variable/archivo/wdth.css';
+import '@fontsource-variable/bricolage-grotesque/index.css';
+import '@fontsource/alfa-slab-one/400.css';
+import '@fontsource/courier-prime/700.css';
+import '../../../prototypes/wurf.css';
+import PrototypeLayout from '../../../layouts/PrototypeLayout.astro';
+import { person, projects, ratio } from '../../../prototypes/data';
+import { PIPS, faceVars, moduleVars, roll, rootVars, toStyle } from '../../../prototypes/wurf';
+
+// Startwurf ohne JavaScript: immer derselbe, damit die Seite auch ohne Skript vollständig ist.
+const start = roll(4271, 5, projects.length);
+const faces = [1, 2, 3, 4, 5, 6];
+---
+
+<PrototypeLayout title="Wurf">
+  <div class="wurf" data-wurf style={toStyle(rootVars(start))}>
+    <div class="paper" aria-hidden="true"></div>
+
+    <header class="mast">
+      <a href="#start">J.S.</a>
+      <nav aria-label="Hauptnavigation">
+        <a href="#arbeiten">Arbeiten</a>
+        <a href="#ich">Über mich</a>
+        <a href="#kontakt">Kontakt</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="opening" id="start" aria-labelledby="name">
+        <h1 class="name" id="name">
+          <span class="name__a">Julian</span>
+          <span class="name__b">Schleiminger</span>
+        </h1>
+        <p class="role plate"><strong>{person.role}.</strong> {person.claim}</p>
+        <div class="edition plate" aria-live="polite">
+          <p class="edition__no">Wurf Nr. <span data-out="no">{start.seed}</span></p>
+          <dl>
+            <div><dt>Augen</dt><dd data-out="face">{start.face} · {start.layout}</dd></div>
+            <div><dt>Farbe</dt><dd data-out="palette">{start.palette.name}</dd></div>
+            <div><dt>Schrift</dt><dd data-out="font">{start.font.name}</dd></div>
+            <div><dt>Textur</dt><dd data-out="texture">{start.texture}</dd></div>
+          </dl>
+        </div>
+        <p class="hint">Würfel klicken oder ziehen. Jeder Wurf baut die Seite neu.</p>
+      </section>
+
+      <section class="manifest" id="ich" aria-labelledby="ich-titel">
+        <h2 id="ich-titel" class="manifest__title">Alles selbst beigebracht.</h2>
+        <p class="manifest__text plate">{person.intro}</p>
+        <ul class="skills" aria-label="Kompetenzen">
+          {person.skills.map((s) => <li class="plate">{s}</li>)}
+        </ul>
+      </section>
+
+      <section class="werk" id="arbeiten" aria-labelledby="werk-titel">
+        <h2 id="werk-titel" class="werk__title">Arbeiten</h2>
+        <ul class="mods">
+          {
+            projects.map((p, i) => (
+              <li class="mod" data-mod style={`${toStyle(moduleVars(start, start.modules[i], i))}; view-transition-name: mod-${i}`}>
+                <a href="#arbeiten">
+                  <span class="mod__plate" style={`aspect-ratio: ${ratio(p.format)}`}>
+                    <span class="mod__tag">Platzhalter {p.format}{p.video ? ' · Video' : ''}</span>
+                  </span>
+                  <span class="mod__cap plate">
+                    <strong>{p.title}</strong>
+                    <span>{p.disciplines.join(', ')} · {p.year}</span>
+                  </span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <section class="kontakt" id="kontakt" aria-labelledby="kontakt-titel">
+        <h2 id="kontakt-titel" class="kontakt__title">Noch ein Wurf?</h2>
+        <p class="plate">Oder lieber ein Gespräch. Ich suche eine Festanstellung als Art Director.</p>
+        <a class="kontakt__mail plate" href={`mailto:${person.email}`}>{person.email}</a>
+        <p class="legal plate"><a href="#start">Impressum</a> · <a href="#start">Datenschutz</a> · Prototyp mit Platzhaltern</p>
+      </section>
+    </main>
+
+    <button class="die" type="button" data-die aria-label="Website neu würfeln" aria-describedby="name">
+      <span class="die__cube" data-cube>
+        {
+          faces.map((k) => (
+            <span class={`die__face die__face--${k}`} data-face={k} style={toStyle(faceVars(start, k))}>
+              {Array.from({ length: 9 }, (_, cell) => (
+                <i class={PIPS[k].includes(cell + 1) ? 'on' : ''} />
+              ))}
+            </span>
+          ))
+        }
+      </span>
+    </button>
+  </div>
+</PrototypeLayout>
+
+<script>
+  import { FACE_ROTATION, faceVars, moduleVars, roll, rootVars } from '../../../prototypes/wurf';
+
+  const root = document.querySelector<HTMLElement>('[data-wurf]')!;
+  const die = document.querySelector<HTMLButtonElement>('[data-die]')!;
+  const cube = document.querySelector<HTMLElement>('[data-cube]')!;
+  const mods = [...document.querySelectorAll<HTMLElement>('[data-mod]')];
+  const faces = [...document.querySelectorAll<HTMLElement>('[data-face]')];
+  const out = (key: string) => document.querySelector<HTMLElement>(`[data-out="${key}"]`)!;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let face = 5;
+  let rx = FACE_ROTATION[5][0];
+  let ry = FACE_ROTATION[5][1];
+  let busy = false;
+
+  const setVars = (el: HTMLElement, vars: Record<string, string>) => {
+    for (const [k, v] of Object.entries(vars)) el.style.setProperty(k, v);
+  };
+
+  function apply(seed: number, nextFace: number) {
+    const ed = roll(seed, nextFace, mods.length);
+    setVars(root, rootVars(ed));
+    mods.forEach((m, i) => setVars(m, moduleVars(ed, ed.modules[i], i)));
+    faces.forEach((f) => setVars(f, faceVars(ed, Number(f.dataset.face))));
+    out('no').textContent = String(seed);
+    out('face').textContent = `${ed.face} · ${ed.layout}`;
+    out('palette').textContent = ed.palette.name;
+    out('font').textContent = ed.font.name;
+    out('texture').textContent = ed.texture;
+  }
+
+  // Würfeln: Würfel taumelt, die Seite glitcht kurz und baut sich mit der neuen Augenzahl neu.
+  function throwDie(spin = 2) {
+    if (busy) return;
+    busy = true;
+    const next = 1 + Math.floor(Math.random() * 6);
+    const [bx, by] = FACE_ROTATION[next];
+    rx = Math.ceil(rx / 360) * 360 + spin * 360 + bx;
+    ry = Math.ceil(ry / 360) * 360 + spin * 360 + by;
+    cube.style.setProperty('--rx', `${rx}deg`);
+    cube.style.setProperty('--ry', `${ry}deg`);
+    const seed = 1000 + Math.floor(Math.random() * 9000);
+    const land = () => {
+      const swap = () => apply(seed, next);
+      root.classList.add('is-glitch');
+      if (document.startViewTransition && !reduced) {
+        document.startViewTransition(swap).finished.finally(() => root.classList.remove('is-glitch'));
+      } else {
+        swap();
+        setTimeout(() => root.classList.remove('is-glitch'), 300);
+      }
+      face = next;
+      busy = false;
+    };
+    setTimeout(land, reduced ? 0 : 900);
+  }
+
+  die.addEventListener('click', () => {
+    if (!dragged) throwDie();
+  });
+
+  // Ziehen dreht den Würfel frei, Loslassen mit Schwung würfelt.
+  let dragged = false;
+  let start: { x: number; y: number; rx: number; ry: number } | null = null;
+  die.addEventListener('pointerdown', (e) => {
+    start = { x: e.clientX, y: e.clientY, rx, ry };
+    dragged = false;
+    die.setPointerCapture(e.pointerId);
+    cube.classList.add('is-dragging');
+  });
+  die.addEventListener('pointermove', (e) => {
+    if (!start) return;
+    const dx = e.clientX - start.x;
+    const dy = e.clientY - start.y;
+    if (Math.hypot(dx, dy) > 6) dragged = true;
+    cube.style.setProperty('--rx', `${start.rx - dy * 0.6}deg`);
+    cube.style.setProperty('--ry', `${start.ry + dx * 0.6}deg`);
+  });
+  die.addEventListener('pointerup', (e) => {
+    if (!start) return;
+    cube.classList.remove('is-dragging');
+    const moved = Math.hypot(e.clientX - start.x, e.clientY - start.y);
+    rx = start.rx - (e.clientY - start.y) * 0.6;
+    ry = start.ry + (e.clientX - start.x) * 0.6;
+    start = null;
+    if (dragged && moved > 40) throwDie(1);
+    else if (dragged) {
+      cube.style.setProperty('--rx', `${FACE_ROTATION[face][0]}deg`);
+      cube.style.setProperty('--ry', `${FACE_ROTATION[face][1]}deg`);
+      rx = FACE_ROTATION[face][0];
+      ry = FACE_ROTATION[face][1];
+    }
+    setTimeout(() => (dragged = false), 0);
+  });
+
+  // Der Würfel wandert beim Scrollen aus dem Eröffnungsbild in die Ecke und bleibt dort.
+  function placeDie() {
+    const vw = innerWidth;
+    const vh = innerHeight;
+    const wide = vw > 760;
+    const big = wide ? Math.min(vh * 0.32, vw * 0.2) : vw * 0.34;
+    const small = 64;
+    const t = Math.min(Math.max(scrollY / (vh * 0.8), 0), 1);
+    const e = 1 - Math.pow(1 - t, 3);
+    const fromX = wide ? vw * 0.83 : vw * 0.7;
+    const fromY = wide ? vh * 0.3 : vh * 0.2;
+    const toX = vw - small / 2 - 24;
+    const toY = vh - small / 2 - 24;
+    const size = big + (small - big) * e;
+    die.style.setProperty('--size', `${size}px`);
+    die.style.translate = `${fromX + (toX - fromX) * e - size / 2}px ${fromY + (toY - fromY) * e - size / 2}px`;
+  }
+
+  // Tiefe: hintere Module bewegen sich langsamer und sind unscharf, bis man sie ansieht.
+  function parallax() {
+    const vh = innerHeight;
+    for (const m of mods) {
+      const depth = Number(getComputedStyle(m).getPropertyValue('--depth')) || 0;
+      if (!depth) {
+        m.style.removeProperty('--para');
+        continue;
+      }
+      const r = m.getBoundingClientRect();
+      const offset = (r.top + r.height / 2 - vh / 2) * depth * 0.12;
+      m.style.setProperty('--para', `${offset.toFixed(1)}px`);
+    }
+  }
+
+  let frame = 0;
+  const onScroll = () => {
+    cancelAnimationFrame(frame);
+    frame = requestAnimationFrame(() => {
+      placeDie();
+      if (!reduced) parallax();
+    });
+  };
+  addEventListener('scroll', onScroll, { passive: true });
+  addEventListener('resize', onScroll);
+  onScroll();
+</script>

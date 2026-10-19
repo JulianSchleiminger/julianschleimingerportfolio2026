@@ -1,0 +1,72 @@
+---
+import PrototypeLayout from '../../layouts/PrototypeLayout.astro';
+
+const directions = [
+  {
+    href: '/richtungen/wurf/',
+    name: 'Wurf',
+    idea: 'Generativ: Der Würfel ist Teil der Seite. Jeder Wurf erzeugt Farbe, Schrift, Texturen und Raster neu, die Augenzahl bestimmt das Raster. Klicken oder ziehen.',
+  },
+  {
+    href: '/richtungen/beton/',
+    name: 'Beton',
+    idea: 'Brutalistische Halle aus Sichtbeton. Scrollen bewegt dich in die Tiefe, ferne Platten sind unscharf, das Licht folgt der Maus.',
+  },
+  {
+    href: '/richtungen/atelier/',
+    name: 'Atelier',
+    idea: 'Avantgarde-Collage aus Papier, Stoff, Transparentpapier und Klebeband. Ebenen in verschiedenen Tiefen, Schärfe zieht beim Darüberfahren.',
+  },
+];
+---
+
+<PrototypeLayout title="Richtungen">
+  <main class="overview">
+    <h1>Drei Richtungen, zweite Runde</h1>
+    <p>Startseiten mit Platzhaltern, alle Texturen werden im Code erzeugt. Nichts davon ist final.</p>
+    <ul>
+      {
+        directions.map((d) => (
+          <li>
+            <a href={d.href}>{d.name}</a>
+            <p>{d.idea}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </main>
+</PrototypeLayout>
+
+<style>
+  .overview {
+    max-width: 44rem;
+    margin: 0 auto;
+    padding: 4rem 1.25rem;
+    font-family: system-ui, sans-serif;
+    line-height: 1.5;
+    color: #161616;
+  }
+
+  h1 {
+    margin: 0 0 0.5rem;
+    font-size: 2.5rem;
+    line-height: 1.1;
+  }
+
+  ul {
+    list-style: none;
+    margin: 2.5rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 2rem;
+  }
+
+  li a {
+    font-size: 1.75rem;
+    font-weight: 700;
+  }
+
+  li p {
+    margin: 0.25rem 0 0;
+  }
+</style>
