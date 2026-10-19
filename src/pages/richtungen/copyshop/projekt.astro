@@ -1,0 +1,142 @@
+---
+import '@fontsource-variable/archivo/wdth.css';
+import '@fontsource/courier-prime/400.css';
+import '@fontsource/courier-prime/700.css';
+import '../../../prototypes/copyshop.css';
+import PrototypeLayout from '../../../layouts/PrototypeLayout.astro';
+import { caseStudy, projects, ratio } from '../../../prototypes/data';
+
+const { project, role, sections, gallery } = caseStudy;
+const next = projects[1];
+const placement = ['1 / -1', '1 / span 6', '7 / span 6', '2 / span 4', '7 / span 4', '3 / span 8'];
+---
+
+<PrototypeLayout title={`${project.title} · Copyshop`}>
+  <div class="zine">
+    <header class="sheet sheet--yellow case-head">
+      <nav class="nav" aria-label="Hauptnavigation">
+        <a href="/richtungen/copyshop/#arbeiten">Alle Arbeiten</a>
+        <a href="/richtungen/copyshop/#kontakt">Kontakt</a>
+      </nav>
+      <h1 class="display case-title">{project.title}</h1>
+      <dl class="facts">
+        <div><dt>Kunde</dt><dd>{project.client} (Platzhalter)</dd></div>
+        <div><dt>Jahr</dt><dd>{project.year}</dd></div>
+        <div><dt>Rolle</dt><dd>{role}</dd></div>
+        <div><dt>Disziplinen</dt><dd>{project.disciplines.join(', ')}</dd></div>
+      </dl>
+    </header>
+
+    <article class="sheet sheet--white case-body">
+      <div class="case-text">
+        {
+          sections.map((s, i) => (
+            <section class="slip" style={`--tilt: ${i % 2 ? 1 : -1}deg`}>
+              <h2>{s.heading}</h2>
+              <p>{s.text}</p>
+            </section>
+          ))
+        }
+      </div>
+      <ul class="collage case-gallery">
+        {
+          gallery.map((g, i) => (
+            <li style={`grid-column: ${placement[i]}; --tilt: ${i % 2 ? 0.8 : -0.8}deg`}>
+              <figure class="copy" style={`aspect-ratio: ${ratio(g.format)}`}>
+                {g.video && (
+                  <svg class="play" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M7 4.5v15l12.5-7.5z" />
+                  </svg>
+                )}
+                <figcaption>Platzhalter · {g.label} {g.format}</figcaption>
+              </figure>
+            </li>
+          ))
+        }
+      </ul>
+    </article>
+
+    <footer class="sheet sheet--pink next">
+      <a href="/richtungen/copyshop/projekt/">
+        <span>Nächstes Projekt</span>
+        <strong class="display">{next.title}</strong>
+      </a>
+    </footer>
+  </div>
+</PrototypeLayout>
+
+<style>
+  .case-head .nav {
+    justify-content: space-between;
+    margin-bottom: clamp(3rem, 10vw, 8rem);
+  }
+
+  .case-title {
+    font-size: clamp(2.5rem, 9vw, 7.5rem);
+    max-width: 14ch;
+  }
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: 1rem var(--gap);
+    margin: 0;
+  }
+
+  .facts dt {
+    font-weight: 700;
+  }
+
+  .facts dd {
+    margin: 0;
+  }
+
+  .case-text {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: var(--gap);
+    margin-bottom: clamp(3rem, 8vw, 6rem);
+  }
+
+  .case-text .slip {
+    rotate: var(--tilt);
+  }
+
+  .case-text h2 {
+    margin: 0 0 0.5rem;
+    font-family: var(--font-display);
+    font-variation-settings: 'wdth' 125;
+    font-weight: 900;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+  }
+
+  .case-text p {
+    margin: 0;
+  }
+
+  .next a {
+    display: block;
+    text-decoration: none;
+  }
+
+  .next span {
+    font-weight: 700;
+  }
+
+  .next .display {
+    display: block;
+    margin: 0.5rem 0 0;
+  }
+
+  .next a:hover .display {
+    text-decoration: underline;
+    text-decoration-thickness: 0.08em;
+  }
+
+  @media (max-width: 760px) {
+    .case-gallery li {
+      grid-column: 1 / -1 !important;
+    }
+  }
+</style>

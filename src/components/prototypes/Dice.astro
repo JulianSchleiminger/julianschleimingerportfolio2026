@@ -1,0 +1,55 @@
+---
+// Würfel-Button der Richtung „Würfel“: wechselt das komplette Erscheinungsbild,
+// die Inhalte bleiben gleich. Die gewählte Seite bleibt für die Sitzung erhalten.
+---
+
+<button class="dice" type="button" data-dice aria-label="Design neu würfeln">
+  <svg viewBox="0 0 40 40" aria-hidden="true">
+    <rect x="2" y="2" width="36" height="36" rx="8" class="dice__body"></rect>
+    <g class="dice__pips">
+      <circle cx="20" cy="20" r="3.6" data-pip="1"></circle>
+      <circle cx="11" cy="11" r="3.6" data-pip="2 3"></circle>
+      <circle cx="29" cy="29" r="3.6" data-pip="2 3"></circle>
+    </g>
+  </svg>
+  <span class="dice__label" data-dice-label>Druckbogen</span>
+</button>
+<p class="visually-hidden" aria-live="polite" data-dice-live></p>
+
+<script>
+  const FACES = { '1': 'Druckbogen', '2': 'Setzkasten', '3': 'Kontaktbogen' } as const;
+  type Face = keyof typeof FACES;
+  const root = document.documentElement;
+  const button = document.querySelector<HTMLButtonElement>('[data-dice]')!;
+  const label = document.querySelector<HTMLElement>('[data-dice-label]')!;
+  const live = document.querySelector<HTMLElement>('[data-dice-live]')!;
+
+  function show(face: Face) {
+    root.dataset.face = face;
+    label.textContent = FACES[face];
+    button.querySelectorAll<SVGCircleElement>('[data-pip]').forEach((pip) => {
+      const active = face === '1' ? pip.dataset.pip === '1' : face === '2' ? pip.dataset.pip === '2 3' : true;
+      pip.style.opacity = active ? '1' : '0';
+    });
+    try {
+      sessionStorage.setItem('wuerfel-face', face);
+    } catch {}
+  }
+
+  show((root.dataset.face as Face) || '1');
+
+  button.addEventListener('click', () => {
+    const keys = Object.keys(FACES) as Face[];
+    const others = keys.filter((k) => k !== root.dataset.face);
+    const next = others[Math.floor(Math.random() * others.length)];
+    const swap = () => show(next);
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (document.startViewTransition && !reduced) {
+      button.classList.add('is-rolling');
+      document.startViewTransition(swap).finished.finally(() => button.classList.remove('is-rolling'));
+    } else {
+      swap();
+    }
+    live.textContent = `Neues Design: ${FACES[next]}`;
+  });
+</script>

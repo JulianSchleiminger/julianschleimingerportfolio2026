@@ -1,0 +1,143 @@
+---
+import '@fontsource-variable/bricolage-grotesque/index.css';
+import '../../../prototypes/plakatwand.css';
+import PrototypeLayout from '../../../layouts/PrototypeLayout.astro';
+import { person, projects, ratio } from '../../../prototypes/data';
+
+// Plakatfarben im Wechsel, Höhe des Plakats relativ zur Wand.
+const looks = [
+  { tone: 'orange', height: 78 },
+  { tone: 'paper', height: 62 },
+  { tone: 'pink', height: 70 },
+  { tone: 'ultra', height: 84 },
+  { tone: 'acid', height: 58 },
+  { tone: 'paper', height: 74 },
+  { tone: 'orange', height: 66 },
+  { tone: 'ultra', height: 72 },
+  { tone: 'acid', height: 80 },
+];
+---
+
+<PrototypeLayout title="Plakatwand">
+  <div class="wall-page">
+    <header class="bar">
+      <a href="#start" class="bar__name">Julian Schleiminger</a>
+      <nav aria-label="Hauptnavigation">
+        <a href="#arbeiten">Arbeiten</a>
+        <a href="#ueber">Über mich</a>
+        <a href="#kontakt">Kontakt</a>
+      </nav>
+    </header>
+
+    <div class="track" data-track>
+      <div class="viewport">
+        <main class="wall" data-wall>
+          <section class="poster poster--ultra poster--hero" id="start" tabindex="-1" aria-labelledby="hero-titel">
+            <h1 id="hero-titel">
+              <span>Art</span>
+              <span>Director</span>
+            </h1>
+            <p class="poster__sub">{person.claim}</p>
+            <p class="poster__foot">
+              <span>Julian Schleiminger</span>
+              <a href="#arbeiten">Zu den Arbeiten</a>
+            </p>
+          </section>
+
+          <section class="poster poster--paper poster--about" id="ueber" tabindex="-1" aria-labelledby="ueber-titel">
+            <h2 id="ueber-titel">Selbst beigebracht.</h2>
+            <p>{person.intro}</p>
+            <ul class="tags" aria-label="Kompetenzen">
+              {person.skills.map((s) => <li>{s}</li>)}
+            </ul>
+          </section>
+
+          <h2 class="wall-label" id="arbeiten" tabindex="-1">Arbeiten</h2>
+
+          {
+            projects.map((p, i) => (
+              <a
+                class={`poster poster--${looks[i].tone} poster--work`}
+                href="/richtungen/plakatwand/projekt/"
+                style={`--h: ${looks[i].height}`}
+              >
+                <span class="poster__image" style={`aspect-ratio: ${ratio(p.format)}`}>
+                  {p.video && (
+                    <svg class="play" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M7 4.5v15l12.5-7.5z" />
+                    </svg>
+                  )}
+                  <span class="ph-label">Platzhalter {p.format}</span>
+                </span>
+                <span class="poster__title">{p.title}</span>
+                <span class="poster__meta">
+                  {p.disciplines.join(' · ')} · {p.year}
+                </span>
+              </a>
+            ))
+          }
+
+          <section class="poster poster--acid poster--contact" id="kontakt" tabindex="-1" aria-labelledby="kontakt-titel">
+            <h2 id="kontakt-titel">Stelle frei?</h2>
+            <p>Dann lass uns reden. Ich bringe Ideen mit und setze sie selbst um.</p>
+            <a class="mail" href={`mailto:${person.email}`}>{person.email}</a>
+            <p class="legal"><a href="#start">Impressum</a> · <a href="#start">Datenschutz</a> · Prototyp mit Platzhaltern</p>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <div class="meter" aria-hidden="true">
+      <span class="meter__line"><span data-meter-fill></span></span>
+      <span data-meter-text>0 m</span>
+    </div>
+  </div>
+</PrototypeLayout>
+
+<script>
+  // Senkrechtes Scrollen bewegt die Wand seitwärts (nur auf breiten Bildschirmen).
+  const track = document.querySelector<HTMLElement>('[data-track]')!;
+  const wall = document.querySelector<HTMLElement>('[data-wall]')!;
+  const fill = document.querySelector<HTMLElement>('[data-meter-fill]')!;
+  const text = document.querySelector<HTMLElement>('[data-meter-text]')!;
+  const wide = window.matchMedia('(min-width: 761px)');
+  const METERS = 36;
+
+  function layout() {
+    if (!wide.matches) {
+      track.style.height = '';
+      wall.style.translate = '';
+      return;
+    }
+    const distance = wall.scrollWidth - window.innerWidth;
+    track.style.height = `${distance + window.innerHeight}px`;
+    update();
+  }
+
+  function update() {
+    const distance = wall.scrollWidth - window.innerWidth;
+    const top = track.getBoundingClientRect().top;
+    const progress = wide.matches ? Math.min(Math.max(-top / distance, 0), 1) : Math.min(window.scrollY / (document.body.scrollHeight - window.innerHeight), 1);
+    if (wide.matches) wall.style.translate = `${-progress * distance}px 0`;
+    fill.style.scale = `${progress} 1`;
+    text.textContent = `${Math.round(progress * METERS)} m`;
+  }
+
+  // Ankerlinks springen zur passenden Stelle der Wand.
+  document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      const target = document.querySelector<HTMLElement>(link.hash);
+      if (!target || !wide.matches) return;
+      event.preventDefault();
+      const left = target === wall.firstElementChild ? 0 : target.offsetLeft - window.innerWidth * 0.08;
+      window.scrollTo({ top: track.offsetTop + Math.max(left, 0), behavior: 'smooth' });
+      target.focus({ preventScroll: true });
+    });
+  });
+
+  window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', layout);
+  wide.addEventListener('change', layout);
+  document.fonts.ready.then(layout);
+  layout();
+</script>

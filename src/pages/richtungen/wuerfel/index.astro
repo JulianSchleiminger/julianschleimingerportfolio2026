@@ -1,0 +1,86 @@
+---
+import '@fontsource-variable/schibsted-grotesk/index.css';
+import '@fontsource/alfa-slab-one/400.css';
+import '@fontsource-variable/karla/index.css';
+import '../../../prototypes/wuerfel.css';
+import PrototypeLayout from '../../../layouts/PrototypeLayout.astro';
+import Dice from '../../../components/prototypes/Dice.astro';
+import { person, projects, ratio } from '../../../prototypes/data';
+---
+
+<PrototypeLayout title="Würfel">
+  <script is:inline slot="head">
+    try {
+      document.documentElement.dataset.face = sessionStorage.getItem('wuerfel-face') || '1';
+    } catch (e) {
+      document.documentElement.dataset.face = '1';
+    }
+  </script>
+  <div class="cube">
+    <header class="top">
+      <a href="#start" class="top__name">Julian Schleiminger</a>
+      <nav aria-label="Hauptnavigation">
+        <a href="#arbeiten">Arbeiten</a>
+        <a href="#ueber">Über mich</a>
+        <a href="#kontakt">Kontakt</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" id="start" aria-labelledby="hero-titel">
+        <h1 id="hero-titel" class="hero__title">{person.role}</h1>
+        <p class="hero__claim">{person.claim}</p>
+        <figure class="frame hero__image" style={`aspect-ratio: ${ratio('16:9')}`}>
+          <figcaption>Platzhalter · Lieblingsprojekt 16:9</figcaption>
+        </figure>
+      </section>
+
+      <section class="about" id="ueber" aria-labelledby="ueber-titel">
+        <h2 id="ueber-titel" class="section-title">Selbst beigebracht</h2>
+        <p class="about__text">{person.intro}</p>
+        <ul class="skills" aria-label="Kompetenzen">
+          {person.skills.map((s) => <li>{s}</li>)}
+        </ul>
+      </section>
+
+      <section class="work" id="arbeiten" aria-labelledby="arbeiten-titel">
+        <h2 id="arbeiten-titel" class="section-title">Arbeiten</h2>
+        <ul class="work__list">
+          {
+            projects.map((p, i) => (
+              <li class={`work__item work__item--${p.format.replace(':', 'x')}`}>
+                <a href="/richtungen/wuerfel/projekt/">
+                  <figure class="frame" style={`aspect-ratio: ${ratio(p.format)}`}>
+                    <span class="frame__no" aria-hidden="true">{String(i + 1).padStart(2, '0')}A</span>
+                    {p.video && (
+                      <svg class="play" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M7 4.5v15l12.5-7.5z" />
+                      </svg>
+                    )}
+                    <figcaption>Platzhalter {p.format}</figcaption>
+                  </figure>
+                  <span class="work__title">{p.title}</span>
+                  <span class="work__meta">{p.disciplines.join(', ')} · {p.year}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <section class="contact" id="kontakt" aria-labelledby="kontakt-titel">
+        <h2 id="kontakt-titel" class="contact__title">Stelle frei?</h2>
+        <p>Ich freue mich auf ein Gespräch über Marken, Kampagnen und alles dazwischen.</p>
+        <a class="contact__mail" href={`mailto:${person.email}`}>{person.email}</a>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <a href="#start">Impressum</a>
+      <a href="#start">Datenschutz</a>
+      <span>Prototyp mit Platzhaltern</span>
+    </footer>
+
+    <Dice />
+  </div>
+</PrototypeLayout>

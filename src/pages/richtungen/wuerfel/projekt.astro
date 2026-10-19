@@ -1,0 +1,139 @@
+---
+import '@fontsource-variable/schibsted-grotesk/index.css';
+import '@fontsource/alfa-slab-one/400.css';
+import '@fontsource-variable/karla/index.css';
+import '../../../prototypes/wuerfel.css';
+import PrototypeLayout from '../../../layouts/PrototypeLayout.astro';
+import Dice from '../../../components/prototypes/Dice.astro';
+import { caseStudy, projects, ratio } from '../../../prototypes/data';
+
+const { project, role, sections, gallery } = caseStudy;
+const next = projects[1];
+---
+
+<PrototypeLayout title={`${project.title} · Würfel`}>
+  <script is:inline slot="head">
+    try {
+      document.documentElement.dataset.face = sessionStorage.getItem('wuerfel-face') || '1';
+    } catch (e) {
+      document.documentElement.dataset.face = '1';
+    }
+  </script>
+  <div class="cube">
+    <header class="top">
+      <a href="/richtungen/wuerfel/" class="top__name">Julian Schleiminger</a>
+      <nav aria-label="Hauptnavigation">
+        <a href="/richtungen/wuerfel/#arbeiten">Arbeiten</a>
+        <a href="/richtungen/wuerfel/#kontakt">Kontakt</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero case-hero" aria-labelledby="case-titel">
+        <h1 id="case-titel" class="hero__title case-hero__title">{project.title}</h1>
+        <dl class="case-facts">
+          <div><dt>Kunde</dt><dd>{project.client} (Platzhalter)</dd></div>
+          <div><dt>Jahr</dt><dd>{project.year}</dd></div>
+          <div><dt>Rolle</dt><dd>{role}</dd></div>
+          <div><dt>Disziplinen</dt><dd>{project.disciplines.join(', ')}</dd></div>
+        </dl>
+      </section>
+
+      <section class="case-notes" aria-label="Projektbeschreibung">
+        {
+          sections.map((s) => (
+            <div>
+              <h2 class="section-title">{s.heading}</h2>
+              <p>{s.text}</p>
+            </div>
+          ))
+        }
+      </section>
+
+      <section class="work" aria-label="Bilder">
+        <ul class="work__list">
+          {
+            gallery.map((g, i) => (
+              <li class={`work__item work__item--${g.format.replace(':', 'x')}`}>
+                <figure class="frame" style={`aspect-ratio: ${ratio(g.format)}`}>
+                  <span class="frame__no" aria-hidden="true">{String(i + 1).padStart(2, '0')}A</span>
+                  {g.video && (
+                    <svg class="play" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M7 4.5v15l12.5-7.5z" />
+                    </svg>
+                  )}
+                  <figcaption>Platzhalter · {g.label} {g.format}</figcaption>
+                </figure>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <section class="contact">
+        <a href="/richtungen/wuerfel/projekt/" class="case-next">
+          <span>Nächstes Projekt</span>
+          <strong class="contact__title">{next.title}</strong>
+        </a>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <a href="/richtungen/wuerfel/">Startseite</a>
+      <span>Prototyp mit Platzhaltern</span>
+    </footer>
+
+    <Dice />
+  </div>
+</PrototypeLayout>
+
+<style>
+  .case-hero__title {
+    grid-column: 1 / -1 !important;
+    font-size: clamp(2.75rem, 8vw, 7.5rem) !important;
+    max-width: 14ch;
+  }
+
+  .case-facts {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: 1rem var(--gap);
+    margin: var(--gap) 0 0;
+  }
+
+  .case-facts dt {
+    font-weight: 700;
+  }
+
+  .case-facts dd {
+    margin: 0;
+  }
+
+  .case-notes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: var(--gap);
+  }
+
+  .case-notes .section-title {
+    font-size: 1.75rem !important;
+    margin-bottom: 0.5rem;
+  }
+
+  .case-notes p {
+    margin: 0;
+    max-width: 40ch;
+  }
+
+  .case-next {
+    display: block;
+    text-decoration: none;
+  }
+
+  .case-next .contact__title {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: clamp(2.5rem, 7vw, 6rem) !important;
+  }
+</style>

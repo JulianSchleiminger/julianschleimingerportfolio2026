@@ -1,0 +1,72 @@
+---
+import PrototypeLayout from '../../layouts/PrototypeLayout.astro';
+
+const directions = [
+  {
+    href: '/richtungen/wuerfel/',
+    name: 'Würfel',
+    idea: 'Deine Idee: ein Inhalt, mehrere komplette Erscheinungsbilder. Der Würfel unten rechts wechselt zwischen Druckbogen, Setzkasten und Kontaktbogen.',
+  },
+  {
+    href: '/richtungen/copyshop/',
+    name: 'Copyshop',
+    idea: 'Ein selbst kopiertes Heft auf farbigem Kopierpapier. Steht für „selbst beigebracht, selbst gemacht“.',
+  },
+  {
+    href: '/richtungen/plakatwand/',
+    name: 'Plakatwand',
+    idea: 'Eine lange Berliner Plakatwand, auf dem Desktop seitwärts gescrollt. Jedes Projekt ist ein Plakat.',
+  },
+];
+---
+
+<PrototypeLayout title="Richtungen">
+  <main class="overview">
+    <h1>Drei Richtungen</h1>
+    <p>Prototypen mit Platzhaltern für Startseite und Projektseite. Nichts davon ist final.</p>
+    <ul>
+      {
+        directions.map((d) => (
+          <li>
+            <a href={d.href}>{d.name}</a>
+            <p>{d.idea}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </main>
+</PrototypeLayout>
+
+<style>
+  .overview {
+    max-width: 44rem;
+    margin: 0 auto;
+    padding: 4rem 1.25rem;
+    font-family: system-ui, sans-serif;
+    line-height: 1.5;
+    color: #161616;
+  }
+
+  h1 {
+    margin: 0 0 0.5rem;
+    font-size: 2.5rem;
+    line-height: 1.1;
+  }
+
+  ul {
+    list-style: none;
+    margin: 2.5rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 2rem;
+  }
+
+  li a {
+    font-size: 1.75rem;
+    font-weight: 700;
+  }
+
+  li p {
+    margin: 0.25rem 0 0;
+  }
+</style>

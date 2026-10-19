@@ -1,0 +1,92 @@
+---
+import '@fontsource-variable/archivo/wdth.css';
+import '@fontsource/courier-prime/400.css';
+import '@fontsource/courier-prime/700.css';
+import '../../../prototypes/copyshop.css';
+import PrototypeLayout from '../../../layouts/PrototypeLayout.astro';
+import { person, projects, ratio } from '../../../prototypes/data';
+
+// Spalten-Platzierung für die Collage: Start und Breite im 12er-Raster, Drehung in Grad.
+const collage = [
+  { col: '1 / span 5', tilt: -1.5 },
+  { col: '7 / span 6', tilt: 1 },
+  { col: '2 / span 3', tilt: 2 },
+  { col: '6 / span 4', tilt: -1 },
+  { col: '4 / span 7', tilt: 0.5 },
+  { col: '1 / span 4', tilt: -2 },
+  { col: '6 / span 4', tilt: 1.5 },
+  { col: '8 / span 5', tilt: -0.5 },
+  { col: '2 / span 7', tilt: 1 },
+];
+---
+
+<PrototypeLayout title="Copyshop">
+  <div class="zine">
+    <header class="sheet sheet--pink hero" id="top">
+      <svg class="staple" viewBox="0 0 60 8" aria-hidden="true"><rect x="0" y="2" width="60" height="4" rx="1" /></svg>
+      <nav class="nav" aria-label="Hauptnavigation">
+        <a href="#arbeiten">Arbeiten</a>
+        <a href="#ueber">Über mich</a>
+        <a href="#kontakt">Kontakt</a>
+      </nav>
+      <h1 class="hero__name">
+        <span>Julian</span>
+        <span>Schleim&shy;inger</span>
+      </h1>
+      <p class="hero__claim"><strong>{person.role}.</strong> {person.claim}</p>
+      <figure class="copy hero__image" style={`aspect-ratio: ${ratio('4:5')}`}>
+        <figcaption>Platzhalter · Lieblingsprojekt 4:5</figcaption>
+      </figure>
+      <a class="hero__cta" href="#arbeiten">Arbeiten ansehen</a>
+      <span class="folio" aria-hidden="true">S. 1</span>
+    </header>
+
+    <section class="sheet sheet--yellow about" id="ueber" aria-labelledby="ueber-titel">
+      <h2 id="ueber-titel" class="display">Selbst beigebracht. Selbst gemacht.</h2>
+      <div class="slip">
+        <p>{person.intro}</p>
+      </div>
+      <ul class="skills" aria-label="Kompetenzen">
+        {person.skills.map((skill) => <li>{skill}</li>)}
+      </ul>
+      <span class="folio" aria-hidden="true">S. 2</span>
+    </section>
+
+    <section class="sheet sheet--white work" id="arbeiten" aria-labelledby="arbeiten-titel">
+      <h2 id="arbeiten-titel" class="display">Arbeiten</h2>
+      <ul class="collage">
+        {
+          projects.map((p, i) => (
+            <li style={`grid-column: ${collage[i].col}; --tilt: ${collage[i].tilt}deg`}>
+              <a href="/richtungen/copyshop/projekt/">
+                <figure class="copy" style={`aspect-ratio: ${ratio(p.format)}`}>
+                  {p.video && (
+                    <svg class="play" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M7 4.5v15l12.5-7.5z" />
+                    </svg>
+                  )}
+                  <figcaption>Platzhalter {p.format}{p.video ? ' · Video' : ''}</figcaption>
+                </figure>
+                <span class="caption">
+                  <strong>{p.title}</strong>
+                  {p.disciplines.join(', ')}, {p.year}
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <span class="folio" aria-hidden="true">S. 3</span>
+    </section>
+
+    <footer class="sheet sheet--green contact" id="kontakt">
+      <h2 class="display">Stelle frei?</h2>
+      <p class="contact__lead">Ich freue mich auf ein Gespräch. Portfolio als PDF und Lebenslauf schicke ich gern mit.</p>
+      <a class="contact__mail" href={`mailto:${person.email}`}>{person.email}</a>
+      <p class="legal">
+        <a href="#top">Impressum</a> · <a href="#top">Datenschutz</a> · Prototyp mit Platzhaltern
+      </p>
+      <span class="folio" aria-hidden="true">S. 4</span>
+    </footer>
+  </div>
+</PrototypeLayout>

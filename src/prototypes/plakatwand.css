@@ -1,0 +1,388 @@
+/* Lokale Tokens der Richtung „Plakatwand“: Betonwand, frisch geklebte Plakate, eine Groteske mit Haltung. */
+.wall-page {
+  --concrete: #7b7a75;
+  --concrete-dark: #5f5e5a;
+  --ink: #121212;
+  --paper: #f3f2ec;
+  --orange: #ff6b1f;
+  --pink: #ff9ccb;
+  --ultra: #2233c4;
+  --acid: #e3ee3c;
+  --font: 'Bricolage Grotesque Variable', sans-serif;
+  --gap: clamp(1rem, 2vw, 1.75rem);
+  --bar: 3.5rem;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  font-family: var(--font);
+  font-size: 1.0625rem;
+  line-height: 1.45;
+  color: var(--ink);
+  background-color: var(--concrete);
+  background-image:
+    radial-gradient(circle at 20% 30%, rgb(255 255 255 / 0.06) 0 1px, transparent 2px),
+    radial-gradient(circle at 70% 60%, rgb(0 0 0 / 0.08) 0 1px, transparent 2px);
+  background-size: 9px 11px, 13px 7px;
+  min-height: 100vh;
+}
+
+.wall-page ::selection {
+  background: var(--acid);
+  color: var(--ink);
+}
+
+.wall-page a {
+  color: inherit;
+  text-underline-offset: 0.18em;
+}
+
+.wall-page a:focus-visible,
+.wall-page [tabindex='-1']:focus-visible {
+  outline: 3px solid var(--acid);
+  outline-offset: 4px;
+}
+
+/* Leiste oben */
+.bar {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 10;
+  height: var(--bar);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0 clamp(1rem, 3vw, 2.5rem);
+  background: var(--ink);
+  color: var(--paper);
+  font-weight: 600;
+  font-variation-settings: 'wdth' 90;
+}
+
+.bar a {
+  text-decoration: none;
+}
+
+.bar a:hover {
+  color: var(--acid);
+}
+
+.bar nav {
+  display: flex;
+  gap: 1.5rem;
+  white-space: nowrap;
+}
+
+/* Wand */
+.viewport {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.wall {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--gap);
+  height: 100%;
+  width: max-content;
+  padding: calc(var(--bar) + 3vh) 6vw 9vh;
+  will-change: translate;
+}
+
+.poster {
+  position: relative;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(1.25rem, 2.2vw, 2rem);
+  text-decoration: none;
+  box-shadow: 0 10px 26px -14px rgb(0 0 0 / 0.6);
+}
+
+.wall-page .poster--ultra { background: var(--ultra); color: var(--paper); }
+.poster--orange { background: var(--orange); }
+.poster--pink { background: var(--pink); }
+.poster--acid { background: var(--acid); }
+.poster--paper { background: var(--paper); }
+
+/* Hero-Plakat */
+.poster--hero {
+  height: 100%;
+  width: min(72vw, 120vh);
+  justify-content: space-between;
+}
+
+.poster--hero h1 {
+  margin: 0;
+  font-weight: 800;
+  font-variation-settings: 'wdth' 75;
+  font-size: min(22vh, 10vw);
+  line-height: 0.82;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  color: var(--acid);
+}
+
+.poster--hero h1 span {
+  display: block;
+}
+
+.poster__sub {
+  max-width: 22ch;
+  margin: 0;
+  font-size: clamp(1.375rem, 2.6vw, 2.5rem);
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.poster__foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.125rem;
+}
+
+.poster__foot a {
+  color: var(--acid);
+}
+
+/* Über mich */
+.poster--about {
+  height: 74%;
+  width: clamp(20rem, 34vw, 32rem);
+  justify-content: flex-end;
+  rotate: 0.6deg;
+}
+
+.poster--about h2 {
+  margin: 0 0 1rem;
+  font-weight: 800;
+  font-variation-settings: 'wdth' 75;
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+.poster--about p {
+  margin: 0;
+  max-width: 40ch;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  list-style: none;
+  margin: 1.25rem 0 0;
+  padding: 0;
+}
+
+.tags li {
+  padding: 0.15rem 0.6rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-weight: 600;
+}
+
+.wall-label {
+  align-self: flex-start;
+  margin: 0 0 0 4vw;
+  writing-mode: vertical-rl;
+  rotate: 180deg;
+  font-weight: 800;
+  font-variation-settings: 'wdth' 75;
+  font-size: clamp(3rem, 10vh, 6rem);
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--paper);
+}
+
+/* Projektplakate: Höhe als Anteil der Wand, Breite ergibt sich aus dem Bildformat. */
+.poster--work {
+  width: min-content;
+  gap: 0.75rem;
+  transition: translate 0.45s var(--ease-out), box-shadow 0.45s var(--ease-out);
+}
+
+.poster--work:nth-of-type(odd) {
+  rotate: -0.5deg;
+}
+
+.poster--work:hover,
+.poster--work:focus-visible {
+  translate: 0 -10px;
+  box-shadow: 0 22px 36px -16px rgb(0 0 0 / 0.65);
+}
+
+.poster__image {
+  position: relative;
+  display: block;
+  height: calc(var(--h) * 0.6vh);
+  background: color-mix(in srgb, currentColor 14%, transparent);
+  outline: 2px solid color-mix(in srgb, currentColor 30%, transparent);
+  outline-offset: -2px;
+}
+
+.ph-label {
+  position: absolute;
+  left: 0.75rem;
+  top: 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.play {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 3.5rem;
+  translate: -50% -50%;
+  fill: currentColor;
+}
+
+.poster__title {
+  max-width: 16ch;
+  font-weight: 800;
+  font-variation-settings: 'wdth' 80;
+  font-size: clamp(1.375rem, 2.6vh, 2rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.poster__meta {
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+/* Kontakt */
+.poster--contact {
+  height: 100%;
+  width: min(60vw, 100vh);
+  justify-content: center;
+  margin-left: 4vw;
+}
+
+.poster--contact h2 {
+  margin: 0;
+  font-weight: 800;
+  font-variation-settings: 'wdth' 75;
+  font-size: min(24vh, 13vw);
+  line-height: 0.85;
+  text-transform: uppercase;
+}
+
+.poster--contact p {
+  max-width: 34ch;
+  font-size: clamp(1.125rem, 1.6vw, 1.5rem);
+}
+
+.mail {
+  font-weight: 800;
+  font-size: clamp(1.25rem, 3vw, 2.75rem);
+  overflow-wrap: anywhere;
+}
+
+.legal {
+  margin-top: auto;
+  font-size: 0.875rem !important;
+}
+
+/* Wandmeter */
+.meter {
+  position: fixed;
+  left: clamp(1rem, 3vw, 2.5rem);
+  right: clamp(1rem, 3vw, 2.5rem);
+  bottom: 1.5rem;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--paper);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.meter__line {
+  flex: 1;
+  height: 2px;
+  background: rgb(243 242 236 / 0.35);
+}
+
+.meter__line span {
+  display: block;
+  height: 100%;
+  background: var(--paper);
+  transform-origin: left;
+  scale: 0 1;
+}
+
+/* Schmale Bildschirme: die Wand wird von oben nach unten gelesen. */
+@media (max-width: 760px) {
+  .viewport {
+    position: static;
+    height: auto;
+    overflow: visible;
+  }
+
+  .wall {
+    flex-direction: column;
+    align-items: stretch;
+    width: auto;
+    height: auto;
+    padding: calc(var(--bar) + 1rem) 1rem 5rem;
+    gap: 1.25rem;
+  }
+
+  .poster--hero,
+  .poster--about,
+  .poster--contact,
+  .poster--work {
+    width: auto;
+    height: auto;
+    margin: 0;
+  }
+
+  .poster--hero {
+    min-height: calc(100svh - var(--bar) - 2rem);
+  }
+
+  .poster--hero h1 {
+    font-size: 15.5vw;
+  }
+
+  .poster--contact h2 {
+    font-size: 20vw;
+  }
+
+  .poster--work .poster__image {
+    width: 100%;
+    height: auto;
+  }
+
+  .poster--work:nth-of-type(even) {
+    margin-left: 12%;
+  }
+
+  .poster--work:nth-of-type(odd) {
+    margin-right: 8%;
+  }
+
+  .wall-label {
+    writing-mode: horizontal-tb;
+    rotate: none;
+    margin: 2rem 0 0;
+  }
+
+  .bar__name {
+    font-size: 0.9375rem;
+  }
+
+  .bar nav {
+    gap: 1rem;
+    font-size: 0.9375rem;
+  }
+}
