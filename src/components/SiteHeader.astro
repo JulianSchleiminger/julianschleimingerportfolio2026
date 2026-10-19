@@ -1,0 +1,31 @@
+---
+const links = [
+  { href: '/', label: 'Arbeiten' },
+  { href: '/about/', label: 'About' },
+];
+---
+
+<header class="container site-header">
+  <a href="/" class="site-name">Julian Schleiminger</a>
+  <nav aria-label="Hauptnavigation">
+    {links.map((link) => <a href={link.href}>{link.label}</a>)}
+  </nav>
+</header>
+
+<style>
+  .site-header {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding-block: var(--space-4);
+  }
+
+  nav {
+    display: flex;
+    gap: var(--space-4);
+  }
+
+  a {
+    text-decoration: none;
+  }
+</style>
